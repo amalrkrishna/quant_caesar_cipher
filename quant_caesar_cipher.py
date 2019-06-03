@@ -4,7 +4,6 @@ def shiftText(C, N):
     Args:
         C(string): string to be shifted
         N(int): number of places to be shifted
-
     '''
     # See http://ascii.cl/
     upper = {ascii:chr(ascii) for ascii in getRangeList(65,91)}
@@ -116,7 +115,6 @@ def getNext(needle):
 
 
 def takeInputFromUser():
-
     '''
     Function to take input from the user
     Return:
@@ -173,6 +171,38 @@ def main():
 
     print('S_NON_DISPERSED' , S_FIRST_THIRD + S_SECOND_THIRD)
 
+def unittest():
+  """
+  This function runs all the unit test cases for all utility functions.
+  """
+
+  print("Running all unit test cases...")
+
+  print("TEST 1: getListLength(...): ")
+  if( getListLength([10,3,2,7]) == 4 ):
+    print("TEST 1 passed")
+  else:
+    print("TEST 1 failed")
+
+  print("TEST 2: getRangeList(...): ")
+  if( getRangeList(0,5) == [0,1,2,3,4] ):
+    print("TEST 2 passed")
+  else:
+    print("TEST 2 failed")
+
+  print("TEST 3: shiftText(...): ")
+  if( (''.join(map(chr, shiftText('ABC', 1)))) == 'BCD' ):
+    print("TEST 3 passed")
+  else:
+    print("TEST 3 failed")
+
+  print("TEST 4: KMPSearch(...): ")
+  if(KMPSearch(list("ABC"),list("BC"))==1):
+    print("TEST 4 passed")
+  else:
+    print("TEST 4 failed")
+
 if __name__ == "__main__":
+  unittest()
   main()
   
