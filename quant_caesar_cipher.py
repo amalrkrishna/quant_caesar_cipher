@@ -70,6 +70,9 @@ def KMPSearch(haystack, needle):
     if not needle:
         return 0
 
+    haystack = ''.join(haystack)
+    needle = ''.join(needle)
+
     length_hay = getListLength(haystack)
     length_needle = getListLength(needle)
     next = getNext(needle)
@@ -113,7 +116,6 @@ def getNext(needle):
             k = nextL[k]
     return nextL
 
-
 def takeInputFromUser():
     '''
     Function to take input from the user
@@ -129,6 +131,53 @@ def takeInputFromUser():
 
     return(S, C, N)
 
+def partA(S_List, S_Len, C_List, C_Len, N):
+
+    C_SHIFT = ''.join(map(chr, shiftText(''.join(C_List), N)))
+    
+    S_FIRST_THIRD = S_List[:int(S_Len/3)]
+    S_SECOND_THIRD = S_List[int(S_Len/3):]
+
+    i = 0
+
+    while(i < getListLength(S_FIRST_THIRD)):
+        search_in_first_half = KMPSearch(S_FIRST_THIRD, C_List)
+        search_in_second_half = KMPSearch(S_SECOND_THIRD, C_SHIFT)
+
+        if search_in_first_half != -1 and search_in_second_half != 1:
+            S_FIRST_THIRD = list(S_FIRST_THIRD)
+            S_FIRST_THIRD[search_in_first_half:(search_in_first_half+getListLength(C_List))] = list(C_SHIFT)
+            S_FIRST_THIRD = ''.join(S_FIRST_THIRD)
+
+            S_SECOND_THIRD = list(S_SECOND_THIRD)
+            S_SECOND_THIRD[search_in_second_half:(search_in_second_half+getListLength(C_List))] = list(C_List)
+            S_SECOND_THIRD = ''.join(S_SECOND_THIRD)
+        else:
+            i = i + 1
+
+    return S_FIRST_THIRD + S_SECOND_THIRD
+
+def partB(S_List, S_Len, C_List, C_Len, N):
+
+  C_SHIFT = ''.join(map(chr, shiftText(''.join(C_List), N)))
+
+  if(''.join(C_List) == C_SHIFT ):
+    return ''.join(S_List)
+
+  S_FIRST_THIRD = S_List[:int(S_Len/3)]
+  S_SECOND_THIRD = S_List[int(S_Len/3):]
+
+  search_in_first_half = KMPSearch(S_FIRST_THIRD, C_List)
+  search_in_second_half = KMPSearch(S_SECOND_THIRD, C_SHIFT)
+
+  if search_in_first_half >= 0 and search_in_second_half >= 0:
+    S_List[search_in_first_half:search_in_first_half+C_Len] = list(C_SHIFT)
+    S_List[int(S_Len/3)+search_in_second_half:int(S_Len/3)+search_in_second_half+C_Len] = C_List
+  else:
+    return ''.join(S_List)
+
+  return partB(S_List, S_Len, C_List, C_Len, N)
+    
 def main():
 
     #temporary input
@@ -148,28 +197,14 @@ def main():
 
     S_List = list(S)
     C_List = list(C)
+    S_Len = getListLength(S_List)
+    C_Len = getListLength(C_List)
 
-    S_FIRST_THIRD = S[:int(getListLength(S_List)/3)]
-    S_SECOND_THIRD = S[int(getListLength(S_List)/3):]
+    S_PART_A = partA(S_List, S_Len, C_List, C_Len, N)
+    S_PART_B = partB(S_List, S_Len, C_List, C_Len, N)
 
-    i = 0
-
-    while(i < getListLength(S_FIRST_THIRD)):
-        search_in_first_half = KMPSearch(S_FIRST_THIRD, C)
-        search_in_second_half = KMPSearch(S_SECOND_THIRD, C_SHIFT)
-
-        if search_in_first_half != -1 and search_in_second_half != 1:
-            S_FIRST_THIRD = list(S_FIRST_THIRD)
-            S_FIRST_THIRD[search_in_first_half:(search_in_first_half+getListLength(C))] = list(C_SHIFT)
-            S_FIRST_THIRD = ''.join(S_FIRST_THIRD)
-
-            S_SECOND_THIRD = list(S_SECOND_THIRD)
-            S_SECOND_THIRD[search_in_second_half:(search_in_second_half+getListLength(C))] = list(C)
-            S_SECOND_THIRD = ''.join(S_SECOND_THIRD)
-        else:
-            i = i + 1
-
-    print('S_NON_DISPERSED' , S_FIRST_THIRD + S_SECOND_THIRD)
+    print('S_PART_A = ' , S_PART_A)
+    print('S_PART_B = ' , S_PART_B)
 
 def unittest():
   """
@@ -201,6 +236,14 @@ def unittest():
     print("TEST 4 passed")
   else:
     print("TEST 4 failed")
+
+  print("TEST 5: partA(...): ")
+  if(partA(list('ABCXXABCXXBCDXXBCD'), 18, list('ABC'), 3, 1)=='BCDXXABCXXABCXXBCD'):
+    print("TEST 5 passed")
+  else:
+    print("TEST 5 failed")
+
+  print('all tests have been finished...\n')
 
 if __name__ == "__main__":
   unittest()
