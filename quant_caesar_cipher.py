@@ -1,3 +1,11 @@
+'''
+Importing unittest for testcases.
+If this could not be done, I would have gone ahead and written if-else cases for test cases.
+Assuming the utiltiy functions were meant for range, length etc.
+'''
+import unittest
+import time
+
 def shiftText(C, N):
     '''
     shiftText function shifts the string C to N places
@@ -61,6 +69,16 @@ def getRangeList(start, end, step=1):
     current += step
   return rangeList
 
+def ceil(num):
+  inum = int(num)
+  if num == float(inum):
+    return inum
+  return inum + 1
+
+def listToString(myList):
+  return ''.join(myList)
+
+
 def KMPSearch(haystack, needle):
     '''
     Start KMP searching using the principle shown in the getNext function. 
@@ -70,8 +88,8 @@ def KMPSearch(haystack, needle):
     if not needle:
         return 0
 
-    haystack = ''.join(haystack)
-    needle = ''.join(needle)
+    haystack = listToString(haystack)
+    needle = listToString(needle)
 
     length_hay = getListLength(haystack)
     length_needle = getListLength(needle)
@@ -133,7 +151,10 @@ def takeInputFromUser():
 
 def partA(S_List, S_Len, C_List, C_Len, N):
 
-    C_SHIFT = ''.join(map(chr, shiftText(''.join(C_List), N)))
+    C_SHIFT = listToString(map(chr, shiftText(listToString(C_List), N)))
+
+    if(listToString(C_List) == C_SHIFT ):
+      return listToString(S_List)
     
     S_FIRST_THIRD = S_List[:int(S_Len/3)]
     S_SECOND_THIRD = S_List[int(S_Len/3):]
@@ -147,11 +168,11 @@ def partA(S_List, S_Len, C_List, C_Len, N):
         if search_in_first_half != -1 and search_in_second_half != 1:
             S_FIRST_THIRD = list(S_FIRST_THIRD)
             S_FIRST_THIRD[search_in_first_half:(search_in_first_half+getListLength(C_List))] = list(C_SHIFT)
-            S_FIRST_THIRD = ''.join(S_FIRST_THIRD)
+            S_FIRST_THIRD = listToString(S_FIRST_THIRD)
 
             S_SECOND_THIRD = list(S_SECOND_THIRD)
             S_SECOND_THIRD[search_in_second_half:(search_in_second_half+getListLength(C_List))] = list(C_List)
-            S_SECOND_THIRD = ''.join(S_SECOND_THIRD)
+            S_SECOND_THIRD = listToString(S_SECOND_THIRD)
         else:
             i = i + 1
 
@@ -159,13 +180,13 @@ def partA(S_List, S_Len, C_List, C_Len, N):
 
 def partB(S_List, S_Len, C_List, C_Len, N):
 
-  C_SHIFT = ''.join(map(chr, shiftText(''.join(C_List), N)))
+  C_SHIFT = listToString(map(chr, shiftText(listToString(C_List), N)))
 
-  if(''.join(C_List) == C_SHIFT ):
-    return ''.join(S_List)
+  if(listToString(C_List) == C_SHIFT ):
+    return listToString(S_List)
 
-  S_FIRST_THIRD = S_List[:int(S_Len/3)]
-  S_SECOND_THIRD = S_List[int(S_Len/3):]
+  S_FIRST_THIRD = S_List[:ceil(S_Len/3)]
+  S_SECOND_THIRD = S_List[ceil(S_Len/3):]
 
   search_in_first_half = KMPSearch(S_FIRST_THIRD, C_List)
   search_in_second_half = KMPSearch(S_SECOND_THIRD, C_SHIFT)
@@ -174,14 +195,80 @@ def partB(S_List, S_Len, C_List, C_Len, N):
     S_List[search_in_first_half:search_in_first_half+C_Len] = list(C_SHIFT)
     S_List[int(S_Len/3)+search_in_second_half:int(S_Len/3)+search_in_second_half+C_Len] = C_List
   else:
-    return ''.join(S_List)
+    return listToString(S_List)
 
   return partB(S_List, S_Len, C_List, C_Len, N)
+
+def partC(S_List, S_Len, C_List, C_Len, N):
+
+  C_SHIFT = list(listToString(map(chr, shiftText(listToString(C_List), N))))
+
+  if(listToString(C_List) == C_SHIFT ):
+    return listToString(S_List)
+  
+  S_FIRST_THIRD = S_List[:ceil(S_Len/3)]
+  S_SECOND_THIRD = S_List[ceil(S_Len/3):]
+  
+  index = 0
+
+  while True:
+    search_in_first_half = KMPSearch(S_FIRST_THIRD, C_List)
+    if search_in_first_half != -1:
+      temp = S_SECOND_THIRD
+      for i in getRangeList(0, C_Len):
+        for k in getRangeList(0, getListLength(S_SECOND_THIRD)):
+          if C_SHIFT[i] == S_SECOND_THIRD[k] and k >= index:
+            temp[k] = C_List[i]
+            index = k
+            break
+
+      S_SECOND_THIRD = temp 
+      S_FIRST_THIRD = list(S_FIRST_THIRD)
+      S_FIRST_THIRD[search_in_first_half:(search_in_first_half+getListLength(C_List))] = list(C_SHIFT)
+      S_FIRST_THIRD = listToString(S_FIRST_THIRD)
+
+    else:
+      break
+
+  return listToString(S_FIRST_THIRD) + listToString(S_SECOND_THIRD)
+
+def partD(S_List, S_Len, C_List, C_Len, N):
+
+  C_SHIFT = list(listToString(map(chr, shiftText(listToString(C_List), N))))
+
+  if(listToString(C_List) == C_SHIFT ):
+    return listToString(S_List)
+  
+  S_FIRST_THIRD = S_List[:ceil(S_Len/3)]
+  S_SECOND_THIRD = S_List[ceil(S_Len/3):]
+  
+  index = 0
+
+  while True:
+    search_in_first_half = KMPSearch(S_FIRST_THIRD, C_List)
+    if search_in_first_half != -1:
+      temp = S_SECOND_THIRD
+      for i in getRangeList(0, C_Len):
+        for k in getRangeList(0, getListLength(S_SECOND_THIRD)):
+          if C_SHIFT[i] == S_SECOND_THIRD[k] and k >= index:
+            temp[k] = C_List[i]
+            index = k
+            break
+
+      S_SECOND_THIRD = temp 
+      S_FIRST_THIRD = list(S_FIRST_THIRD)
+      S_FIRST_THIRD[search_in_first_half:(search_in_first_half+getListLength(C_List))] = list(C_SHIFT)
+      S_FIRST_THIRD = listToString(S_FIRST_THIRD)
+
+    else:
+      break
+
+  return listToString(S_FIRST_THIRD) + listToString(S_SECOND_THIRD)
     
 def main():
 
     #temporary input
-    S = 'ABCXXABCXXBCDXXBCD'
+    S = 'AABCXABCXXBCDXXBCD'
     C = 'ABC'
     N = 1
 
@@ -191,7 +278,7 @@ def main():
     print('C = ', C)
     print('N = ', N)
 
-    C_SHIFT = (''.join(map(chr, shiftText(C, N))))
+    C_SHIFT = (listToString(map(chr, shiftText(C, N))))
 
     print('C_SHIFT = ' , C_SHIFT)
 
@@ -200,52 +287,40 @@ def main():
     S_Len = getListLength(S_List)
     C_Len = getListLength(C_List)
 
-    S_PART_A = partA(S_List, S_Len, C_List, C_Len, N)
-    S_PART_B = partB(S_List, S_Len, C_List, C_Len, N)
+    print(listToString(S_List))
 
-    print('S_PART_A = ' , S_PART_A)
-    print('S_PART_B = ' , S_PART_B)
+    #S_PART_A = partA(S_List, S_Len, C_List, C_Len, N)
+    #S_PART_B = partB(S_List, S_Len, C_List, C_Len, N)
+    S_PART_C = partC(S_List, S_Len, C_List, C_Len, N)
 
-def unittest():
-  """
-  This function runs all the unit test cases for all utility functions.
-  """
+    #print('S_PART_A = ' , S_PART_A)
+    #print('S_PART_B = ' , S_PART_B)
+    print('S_PART_C = ' , S_PART_C)
 
-  print("Running all unit test cases...")
+class TestMethods(unittest.TestCase):
 
-  print("TEST 1: getListLength(...): ")
-  if( getListLength([10,3,2,7]) == 4 ):
-    print("TEST 1 passed")
-  else:
-    print("TEST 1 failed")
+    def test_getListLength(self):
+      self.assertEqual(getListLength([10,3,2,7]), 4)
 
-  print("TEST 2: getRangeList(...): ")
-  if( getRangeList(0,5) == [0,1,2,3,4] ):
-    print("TEST 2 passed")
-  else:
-    print("TEST 2 failed")
+    def test_getRangeList(self):
+      self.assertEqual(getRangeList(0,5), [0,1,2,3,4])
 
-  print("TEST 3: shiftText(...): ")
-  if( (''.join(map(chr, shiftText('ABC', 1)))) == 'BCD' ):
-    print("TEST 3 passed")
-  else:
-    print("TEST 3 failed")
+    def test_shiftText(self):
+      self.assertEqual(listToString(map(chr, shiftText('ABC', 1))), 'BCD')
 
-  print("TEST 4: KMPSearch(...): ")
-  if(KMPSearch(list("ABC"),list("BC"))==1):
-    print("TEST 4 passed")
-  else:
-    print("TEST 4 failed")
+    def test_KMPSearch(self):
+      self.assertTrue(KMPSearch(list("ABC"),list("BC")))
 
-  print("TEST 5: partA(...): ")
-  if(partA(list('ABCXXABCXXBCDXXBCD'), 18, list('ABC'), 3, 1)=='BCDXXABCXXABCXXBCD'):
-    print("TEST 5 passed")
-  else:
-    print("TEST 5 failed")
-
-  print('all tests have been finished...\n')
+    def test_partA(self):
+      self.assertEqual(partA(list('ABCXXABCXXBCDXXBCD'), 18, list('ABC'), 3, 1), 'BCDXXABCXXABCXXBCD')
+    
+    def test_partB(self):
+      self.assertEqual(partB(list('ABCXXABCXXBCDXXBCD'), 18, list('ABC'), 3, 1), 'BCDXXABCXXABCXXBCD')
+    
+    def test_partC(self):
+      self.assertEqual(partC(list('ABCXXABCXXBXXCXDXBCD'), 20, list('ABC'), 3, 1), 'BCDXXABCXXAXXBXCXBCD')
 
 if __name__ == "__main__":
-  unittest()
+  runner = unittest.TextTestRunner(verbosity=2)
+  unittest.main(testRunner=runner, exit=False)
   main()
-  
