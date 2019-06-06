@@ -22,6 +22,15 @@ def shiftText(C, N):
         C(string): string to be shifted
         N(int): number of places to be shifted
     '''
+
+    #no rotation needed
+    if N == 0:
+      return C
+    
+    #invalid string
+    if C == '':
+      return 0
+
     #see http://ascii.cl/
     upper = {ascii:chr(ascii) for ascii in getRangeList(65,91)}
     lower = {ascii:chr(ascii) for ascii in getRangeList(97,123)}
@@ -207,7 +216,7 @@ def switches_occurrences_part_a(S_List, S_Len, C_List, C_Len, N):
   S_SECOND_THIRD = S_List[int(S_Len/3):]
 
   while True:
-    #search for C_List in first third of S_List
+    #a
     search_in_first_third = KMPSearch(S_FIRST_THIRD, C_List)
     #search for C_SHIFT in second third of S_List
     search_in_second_third = KMPSearch(S_SECOND_THIRD, C_SHIFT)
@@ -270,24 +279,36 @@ def switches_occurrences_recursion_part_b(S_List, S_Len, C_List, C_Len, N):
 
 def disperse(S_SECOND_THIRD, C_SHIFT):
   '''
+  Custom function to find the indexes to disperse C_SHIFT in S_SECOND_THIRD.
+
+  Args:
+    S_SECOND_THIRD(list): list(string) to search
+    C_SHIFT(list): list(string) we need to disperse into S_SECOND_THIRD 
+  Return:
+    search_in_second_half(list): list of indexes to be dispersed
 
   '''
-
+  #initialize an empty index array
   search_in_second_half = []
   index = 0
   
+  #loops through each character in C_SHIFT
   for i in getRangeList(0, getListLength(C_SHIFT)):
+    #loops through each character in S_SECOND_THIRD
     for k in getRangeList(0, getListLength(S_SECOND_THIRD)):
       if C_SHIFT[i] == S_SECOND_THIRD[k] and k >= index:
+        #each time C_SHIFT[i] and S_SECOND_THIRD[k] matches and k>= index
+        #append the index to search_in_second_half
         index = k
         search_in_second_half = search_in_second_half + [k]
+        #break if one dispersion index has been found for each C_SHIFT
         break
 
   return search_in_second_half
 
 def disperse_occurrences_part_c(S_List, S_Len, C_List, C_Len, N):
   '''
-  switches_occurrences_part_a function solves for part A
+  disperse_occurrences_part_c function solves for part C
 
   Args: 
     S_List(list): string S converted into list
@@ -303,26 +324,36 @@ def disperse_occurrences_part_c(S_List, S_Len, C_List, C_Len, N):
   if(listToString(C_List) == C_SHIFT ):
     return listToString(S_List)
   
+  #subset first third and second third lists from S_List
   S_FIRST_THIRD = S_List[:ceil(S_Len/3)]
   S_SECOND_THIRD = S_List[ceil(S_Len/3):]
 
   while True:
+    #search for C_List in first third of S_List
     search_in_first_half = KMPSearch(S_FIRST_THIRD, C_List)
+    #search for C_SHIFT indexes in second third of S_List
+    #So that C_List can be subsequently dispersed into these indexes
     search_in_second_half = disperse(S_SECOND_THIRD, C_SHIFT)
 
+    #run the while loop
+    #until there are no more occurences of C_List and C_SHIFT in first third and second third respectively
+    #C_SHIFT should be completely (length 3) able to dispersed into second third
     if getListLength(search_in_second_half) == 3 and (search_in_first_half != -1) == True:
       S_FIRST_THIRD = list(S_FIRST_THIRD)
       S_FIRST_THIRD[search_in_first_half:(search_in_first_half+getListLength(C_List))] = list(C_SHIFT)
       S_FIRST_THIRD = listToString(S_FIRST_THIRD)
 
+      #Dispersing the C_List values into S_SECOND_THIRD using
+      #the indexes calculated from the disperse() function
       for k in range(len(search_in_second_half)):
         S_SECOND_THIRD[search_in_second_half[k]] = C_List[k]
     else:
+      #return the updated combined string
       return listToString(S_FIRST_THIRD) + listToString(S_SECOND_THIRD)
 
 def disperse_occurrences_recursion_part_d(S_List, S_Len, C_List, C_Len, N):
   '''
-  switches_occurrences_part_a function solves for part A
+  disperse_occurrences_recursion_part_d function solves for part D
 
   Args: 
     S_List(list): string S converted into list
@@ -337,23 +368,36 @@ def disperse_occurrences_recursion_part_d(S_List, S_Len, C_List, C_Len, N):
 
   if(listToString(C_List) == C_SHIFT ):
     return listToString(S_List)
-  
+
+  #subset first third and second third lists from S_List  
   S_FIRST_THIRD = S_List[:ceil(S_Len/3)]
   S_SECOND_THIRD = S_List[ceil(S_Len/3):]
 
+  #search for C_List in first third of S_List
   search_in_first_half = KMPSearch(S_FIRST_THIRD, C_List)
+  #search for C_SHIFT indexes in second third of S_List
+  #So that C_List can be subsequently dispersed into these indexes
   search_in_second_half = disperse(S_SECOND_THIRD, C_SHIFT)
 
+  #recall disperse_occurrences_recursion_part_d recursively
+  #until there are no more occurences of C_List and C_SHIFT in first third and second third respectively
+  #C_SHIFT should be completely (length 3) able to dispersed into second third
   if getListLength(search_in_second_half) == 3 and search_in_first_half != -1:
     S_List[search_in_first_half:search_in_first_half+C_Len] = C_SHIFT
     for i in getRangeList(0,C_Len):
       S_List[ceil(S_Len/3)+search_in_second_half[i]] = C_List[i]
   else:
+    #return the updated string
     return listToString(S_List)
 
+  #recall disperse_occurrences_recursion_part_d recursively
+  #until there are no more occurences of C_List and C_SHIFT to disperse in first third and second third respectively
   return disperse_occurrences_recursion_part_d(S_List, S_Len, C_List, C_Len, N)
     
 def main():
+  '''
+  Main for the program. This is run after running all the unit test cases.
+  '''
 
   #temporary input
   S = 'ABCXXABCXXBCDXXBCD'
