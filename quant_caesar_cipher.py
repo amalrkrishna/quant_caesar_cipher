@@ -19,8 +19,10 @@ def shiftText(C, N):
     No change on symbols and digits.
     Rotation on uppercase and lowercase characters.
     Args:
-        C(string): string to be shifted
-        N(int): number of places to be shifted
+      C(string): string to be shifted
+      N(int): number of places to be shifted
+    Return:
+      cipher(string): shifted string
     '''
 
     #no rotation needed
@@ -36,24 +38,28 @@ def shiftText(C, N):
     lower = {ascii:chr(ascii) for ascii in getRangeList(97,123)}
     digit = {ascii:chr(ascii) for ascii in getRangeList(48,58)}
 
+    cipher = ''
+
     for c in C:
-        o = ord(c)
-        # Do not change symbols and digits
-        if (o not in upper and o not in lower) or o in digit:
-            yield o
-        else:
-            # If it's in the upper case and
-            # that the rotation is within the uppercase
-            if o in upper and o + N % 26 in upper:
-                yield o + N % 26
-            # If it's in the lower case and
-            # that the rotation is within the lowercase
-            elif o in lower and o + N % 26 in lower:
-                yield o + N % 26
-            # Otherwise move back 26 space
-            # s after rotation.
-            else: # alphabet.
-                yield o + N % 26 -26
+      o = ord(c)
+      # Do not change symbols and digits
+      if (o not in upper and o not in lower) or o in digit:
+        cipher = cipher + chr(o)
+      else:
+        # If it's in the upper case and
+        # that the rotation is within the uppercase
+        if o in upper and o + N % 26 in upper:
+          cipher = cipher + chr(o + N % 26)
+        # If it's in the lower case and
+        # that the rotation is within the lowercase
+        elif o in lower and o + N % 26 in lower:
+          cipher = cipher + chr(o + N % 26)
+        # Otherwise move back 26 space
+        # s after rotation.
+        else: # alphabet.
+          cipher = cipher + chr(o + N % 26-26)
+
+    return cipher
 
 def getListLength(myList):
   """
@@ -206,7 +212,7 @@ def switches_occurrences_part_a(S_List, S_Len, C_List, C_Len, N):
   '''
 
   #calculate C_SHIFT using the shiftText function
-  C_SHIFT = listToString(map(chr, shiftText(listToString(C_List), N)))
+  C_SHIFT = listToString(shiftText(listToString(C_List), N))
 
   if(listToString(C_List) == C_SHIFT):
     return listToString(S_List)
@@ -222,7 +228,7 @@ def switches_occurrences_part_a(S_List, S_Len, C_List, C_Len, N):
     search_in_second_third = KMPSearch(S_SECOND_THIRD, C_SHIFT)
 
     #run the while loop until there is no more C_List occurences inside first third 
-    #and C_SHIFT inside second third
+    #or C_SHIFT inside second third
     if search_in_first_third != -1 and search_in_second_third != 1:
       S_FIRST_THIRD = list(S_FIRST_THIRD)
       #replace the C_List occurrence in first third by C_SHIFT
@@ -250,7 +256,7 @@ def switches_occurrences_recursion_part_b(S_List, S_Len, C_List, C_Len, N):
   '''
 
   #calculate C_SHIFT using the shiftText function
-  C_SHIFT = listToString(map(chr, shiftText(listToString(C_List), N)))
+  C_SHIFT = listToString(shiftText(listToString(C_List), N))
 
   if(listToString(C_List) == C_SHIFT ):
     return listToString(S_List)
@@ -268,13 +274,13 @@ def switches_occurrences_recursion_part_b(S_List, S_Len, C_List, C_Len, N):
     #replace the C_List occurrence in first third by C_SHIFT
     S_List[search_in_first_third:search_in_first_third+C_Len] = list(C_SHIFT)
     #replace the C_SHIFT occurrence in second third by C_List
-    S_List[int(S_Len/3)+search_in_second_third:int(S_Len/3)+search_in_second_third+C_Len] = C_List
+    S_List[ceil(S_Len/3)+search_in_second_third:ceil(S_Len/3)+search_in_second_third+C_Len] = C_List
   else:
     #return the updated combined string
     return listToString(S_List)
 
   #recall switches_occurrences_recursion_part_b recursively
-  #until there are no more occurences of C_List and C_SHIFT in first third and second third respectively
+  #until there are no more occurences of C_List and C_SHIFT in first third or second third respectively
   return switches_occurrences_recursion_part_b(S_List, S_Len, C_List, C_Len, N)
 
 def disperse(S_SECOND_THIRD, C_SHIFT):
@@ -319,7 +325,7 @@ def disperse_occurrences_part_c(S_List, S_Len, C_List, C_Len, N):
   '''
 
   #calculate C_SHIFT using the shiftText function
-  C_SHIFT = list(listToString(map(chr, shiftText(listToString(C_List), N))))
+  C_SHIFT = list(listToString(shiftText(listToString(C_List), N)))
 
   if(listToString(C_List) == C_SHIFT ):
     return listToString(S_List)
@@ -336,7 +342,7 @@ def disperse_occurrences_part_c(S_List, S_Len, C_List, C_Len, N):
     search_in_second_half = disperse(S_SECOND_THIRD, C_SHIFT)
 
     #run the while loop
-    #until there are no more occurences of C_List and C_SHIFT in first third and second third respectively
+    #until there are no more occurences of C_List and C_SHIFT in first third or second third respectively
     #C_SHIFT should be completely (length 3) able to dispersed into second third
     if getListLength(search_in_second_half) == 3 and (search_in_first_half != -1) == True:
       S_FIRST_THIRD = list(S_FIRST_THIRD)
@@ -364,7 +370,7 @@ def disperse_occurrences_recursion_part_d(S_List, S_Len, C_List, C_Len, N):
   '''
 
   #calculate C_SHIFT using the shiftText function
-  C_SHIFT = list(listToString(map(chr, shiftText(listToString(C_List), N))))
+  C_SHIFT = list(listToString(shiftText(listToString(C_List), N)))
 
   if(listToString(C_List) == C_SHIFT ):
     return listToString(S_List)
@@ -380,7 +386,7 @@ def disperse_occurrences_recursion_part_d(S_List, S_Len, C_List, C_Len, N):
   search_in_second_half = disperse(S_SECOND_THIRD, C_SHIFT)
 
   #recall disperse_occurrences_recursion_part_d recursively
-  #until there are no more occurences of C_List and C_SHIFT in first third and second third respectively
+  #until there are no more occurences of C_List and C_SHIFT in first third or second third respectively
   #C_SHIFT should be completely (length 3) able to dispersed into second third
   if getListLength(search_in_second_half) == 3 and search_in_first_half != -1:
     S_List[search_in_first_half:search_in_first_half+C_Len] = C_SHIFT
@@ -391,7 +397,7 @@ def disperse_occurrences_recursion_part_d(S_List, S_Len, C_List, C_Len, N):
     return listToString(S_List)
 
   #recall disperse_occurrences_recursion_part_d recursively
-  #until there are no more occurences of C_List and C_SHIFT to disperse in first third and second third respectively
+  #until there are no more occurences of C_List and C_SHIFT to disperse in first third or second third respectively
   return disperse_occurrences_recursion_part_d(S_List, S_Len, C_List, C_Len, N)
     
 def main():
@@ -399,9 +405,7 @@ def main():
   Main for the program. This is run after running all the unit test cases.
   '''
 
-  #temporary input
-  S = 'ABCXXABCXXBCDXXBCD'
-  #S = 'AABCXABCXXBCDXXBCD'
+  S = 'ABCXXABCXXBXXCXDXBCD'
   C = 'ABC'
   N = 1
 
@@ -411,24 +415,25 @@ def main():
   print('C = ', C)
   print('N = ', N)
 
-  C_SHIFT = (listToString(map(chr, shiftText(C, N))))
+  C_SHIFT = (listToString(shiftText(C, N)))
 
   print('C_SHIFT = ' , C_SHIFT)
 
   S_List = list(S)
+  S_List_Disperse = list(S)
   C_List = list(C)
   S_Len = getListLength(S_List)
   C_Len = getListLength(C_List)
 
   S_PART_A = switches_occurrences_part_a(S_List, S_Len, C_List, C_Len, N)
   S_PART_B = switches_occurrences_recursion_part_b(S_List, S_Len, C_List, C_Len, N)
-  #S_PART_C = disperse_occurrences_part_c(S_List, S_Len, C_List, C_Len, N)
-  #S_PART_D = disperse_occurrences_recursion_part_d(S_List, S_Len, C_List, C_Len, N)
+  S_PART_C = disperse_occurrences_part_c(S_List_Disperse, S_Len, C_List, C_Len, N)
+  S_PART_D = disperse_occurrences_recursion_part_d(S_List_Disperse, S_Len, C_List, C_Len, N)
 
   print('S_PART_A = ' , S_PART_A)
   print('S_PART_B = ' , S_PART_B)
-  #print('S_PART_C = ' , S_PART_C)
-  #print('S_PART_D = ' , S_PART_D)
+  print('S_PART_C = ' , S_PART_C)
+  print('S_PART_D = ' , S_PART_D)
 
 class TestMethods(unittest.TestCase):
     '''
@@ -442,7 +447,7 @@ class TestMethods(unittest.TestCase):
       self.assertEqual(getRangeList(0,5), [0,1,2,3,4])
 
     def test_shiftText(self):
-      self.assertEqual(listToString(map(chr, shiftText('ABC', 1))), 'BCD')
+      self.assertEqual(listToString(shiftText('ABC', 1)), 'BCD')
 
     def test_KMPSearch(self):
       self.assertTrue(KMPSearch(list("ABC"),list("BC")))
