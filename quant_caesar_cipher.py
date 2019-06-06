@@ -405,11 +405,11 @@ def main():
   Main for the program. This is run after running all the unit test cases.
   '''
 
-  S = 'ABCXXABCXXBXXCXDXBCD'
-  C = 'ABC'
-  N = 1
+  #S = 'ABCXXABCXXBXXCXDXBCD'
+  #C = 'ABC'
+  #N = 1
 
-  #S, C, N = takeInputFromUser()
+  S, C, N = takeInputFromUser()
 
   print('S = ', S)
   print('C = ', C)
