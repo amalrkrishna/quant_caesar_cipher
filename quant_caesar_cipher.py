@@ -463,7 +463,10 @@ class TestMethods(unittest.TestCase):
 
     def test_partD(self):
       self.assertEqual(disperse_occurrences_recursion_part_d(list('ABCXXABCXXBXXCXDXBCD'), 20, list('ABC'), 3, 1), 'BCDXXABCXXAXXBXCXBCD')
-
+    
+    def test_disperse(self):
+      self.assertEqual(disperse(list('CXXBXXCXDXBCD'),'BCD'), [3,6,8])
+    
     def test_listToString(self):
       self.assertEqual(listToString(['A','B','C','D','E','F','G']), 'ABCDEFG')
 
