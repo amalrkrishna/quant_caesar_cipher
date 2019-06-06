@@ -31,20 +31,20 @@ def shiftText(C, N):
         o = ord(c)
         # Do not change symbols and digits
         if (o not in upper and o not in lower) or o in digit:
-            cipher = cipher + o
+            yield o
         else:
             # If it's in the upper case and
             # that the rotation is within the uppercase
             if o in upper and o + N % 26 in upper:
-                cipher = cipher + str(o) + str(N % 26)
+                yield o + N % 26
             # If it's in the lower case and
             # that the rotation is within the lowercase
             elif o in lower and o + N % 26 in lower:
-                cipher = cipher + o + str(N % 26)
+                yield o + N % 26
             # Otherwise move back 26 space
             # s after rotation.
             else: # alphabet.
-                cipher = cipher + o + str(N % 26 -26)
+                yield o + N % 26 -26
 
 def getListLength(myList):
   """
@@ -64,7 +64,7 @@ def getListLength(myList):
 
 def getRangeList(start, end, step=1):
   """
-  getARange function recreates the range functionality in python
+  getRangeList function recreates the range functionality in python
   Args:
     start(int): starting index
     end(int): ending index
@@ -199,26 +199,34 @@ def switches_occurrences_part_a(S_List, S_Len, C_List, C_Len, N):
   #calculate C_SHIFT using the shiftText function
   C_SHIFT = listToString(map(chr, shiftText(listToString(C_List), N)))
 
-  if(listToString(C_List) == C_SHIFT ):
+  if(listToString(C_List) == C_SHIFT):
     return listToString(S_List)
   
+  #subset first third and second third lists from S_List
   S_FIRST_THIRD = S_List[:int(S_Len/3)]
   S_SECOND_THIRD = S_List[int(S_Len/3):]
 
   while True:
-      search_in_first_half = KMPSearch(S_FIRST_THIRD, C_List)
-      search_in_second_half = KMPSearch(S_SECOND_THIRD, C_SHIFT)
+    #search for C_List in first third of S_List
+    search_in_first_third = KMPSearch(S_FIRST_THIRD, C_List)
+    #search for C_SHIFT in second third of S_List
+    search_in_second_third = KMPSearch(S_SECOND_THIRD, C_SHIFT)
 
-      if search_in_first_half != -1 and search_in_second_half != 1:
-          S_FIRST_THIRD = list(S_FIRST_THIRD)
-          S_FIRST_THIRD[search_in_first_half:(search_in_first_half+getListLength(C_List))] = list(C_SHIFT)
-          S_FIRST_THIRD = listToString(S_FIRST_THIRD)
+    #run the while loop until there is no more C_List occurences inside first third 
+    #and C_SHIFT inside second third
+    if search_in_first_third != -1 and search_in_second_third != 1:
+      S_FIRST_THIRD = list(S_FIRST_THIRD)
+      #replace the C_List occurrence in first third by C_SHIFT
+      S_FIRST_THIRD[search_in_first_third:search_in_first_third+getListLength(C_List)] = list(C_SHIFT)
+      S_FIRST_THIRD = listToString(S_FIRST_THIRD)
 
-          S_SECOND_THIRD = list(S_SECOND_THIRD)
-          S_SECOND_THIRD[search_in_second_half:(search_in_second_half+getListLength(C_List))] = list(C_List)
-          S_SECOND_THIRD = listToString(S_SECOND_THIRD)
-      else:
-        return S_FIRST_THIRD + S_SECOND_THIRD
+      S_SECOND_THIRD = list(S_SECOND_THIRD)
+      #replace the C_SHIFT occurrence in second third by C_List
+      S_SECOND_THIRD[search_in_second_third:search_in_second_third+getListLength(C_List)] = list(C_List)
+      S_SECOND_THIRD = listToString(S_SECOND_THIRD)
+    else:
+      #return the updated combined string
+      return S_FIRST_THIRD + S_SECOND_THIRD
 
 def switches_occurrences_recursion_part_b(S_List, S_Len, C_List, C_Len, N):
   '''
@@ -238,18 +246,26 @@ def switches_occurrences_recursion_part_b(S_List, S_Len, C_List, C_Len, N):
   if(listToString(C_List) == C_SHIFT ):
     return listToString(S_List)
 
+  #subset first third and second third lists from S_List
   S_FIRST_THIRD = S_List[:ceil(S_Len/3)]
   S_SECOND_THIRD = S_List[ceil(S_Len/3):]
 
-  search_in_first_half = KMPSearch(S_FIRST_THIRD, C_List)
-  search_in_second_half = KMPSearch(S_SECOND_THIRD, C_SHIFT)
+  #search for C_List in first third of S_List
+  search_in_first_third = KMPSearch(S_FIRST_THIRD, C_List)
+  #search for C_SHIFT in second third of S_List
+  search_in_second_third = KMPSearch(S_SECOND_THIRD, C_SHIFT)
 
-  if search_in_first_half >= 0 and search_in_second_half >= 0:
-    S_List[search_in_first_half:search_in_first_half+C_Len] = list(C_SHIFT)
-    S_List[int(S_Len/3)+search_in_second_half:int(S_Len/3)+search_in_second_half+C_Len] = C_List
+  if search_in_first_third != -1 and search_in_second_third != -1:
+    #replace the C_List occurrence in first third by C_SHIFT
+    S_List[search_in_first_third:search_in_first_third+C_Len] = list(C_SHIFT)
+    #replace the C_SHIFT occurrence in second third by C_List
+    S_List[int(S_Len/3)+search_in_second_third:int(S_Len/3)+search_in_second_third+C_Len] = C_List
   else:
+    #return the updated combined string
     return listToString(S_List)
 
+  #recall switches_occurrences_recursion_part_b recursively
+  #until there are no more occurences of C_List and C_SHIFT in first third and second third respectively
   return switches_occurrences_recursion_part_b(S_List, S_Len, C_List, C_Len, N)
 
 def disperse(S_SECOND_THIRD, C_SHIFT):
@@ -340,7 +356,8 @@ def disperse_occurrences_recursion_part_d(S_List, S_Len, C_List, C_Len, N):
 def main():
 
   #temporary input
-  S = 'AABCXABCXXBCDXXBCD'
+  S = 'ABCXXABCXXBCDXXBCD'
+  #S = 'AABCXABCXXBCDXXBCD'
   C = 'ABC'
   N = 1
 
@@ -361,8 +378,8 @@ def main():
 
   S_PART_A = switches_occurrences_part_a(S_List, S_Len, C_List, C_Len, N)
   S_PART_B = switches_occurrences_recursion_part_b(S_List, S_Len, C_List, C_Len, N)
-  #S_PART_C = partC(S_List, S_Len, C_List, C_Len, N)
-  #S_PART_D = partD(S_List, S_Len, C_List, C_Len, N)
+  #S_PART_C = disperse_occurrences_part_c(S_List, S_Len, C_List, C_Len, N)
+  #S_PART_D = disperse_occurrences_recursion_part_d(S_List, S_Len, C_List, C_Len, N)
 
   print('S_PART_A = ' , S_PART_A)
   print('S_PART_B = ' , S_PART_B)
